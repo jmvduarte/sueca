@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sueca Online</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<!-- ECRÃ INICIAL -->
+<div id="ecra-lobby" class="ecra ativo">
+  <div class="lobby-bg"></div>
+  <div class="lobby-centro">
+    <div class="logo-container">
+      <div class="logo-cartas">
+        <span class="carta-deco" style="--r:-15deg;--c:#c0392b">A♠</span>
+        <span class="carta-deco" style="--r:0deg;--c:#2c3e50">7♥</span>
+        <span class="carta-deco" style="--r:15deg;--c:#c0392b">K♦</span>
+      </div>
+      <h1 class="titulo-jogo">Sueca</h1>
+      <p class="subtitulo">O jogo de cartas português</p>
+    </div>
+
+    <!-- Formulário nome -->
+    <div id="form-nome" class="painel-glass">
+      <h2>Como te chamas?</h2>
+      <input type="text" id="input-nome" placeholder="O teu nome..." maxlength="16" autocomplete="off">
+      <div class="botoes-acao">
+        <button id="btn-criar" class="btn-primary">Criar Sala</button>
+        <button id="btn-entrar-lista" class="btn-secondary">Ver Salas</button>
+      </div>
+      <div id="entrar-codigo" class="entrada-codigo oculto">
+        <input type="text" id="input-codigo" placeholder="Código da sala (ex: AB12CD)" maxlength="6">
+        <button id="btn-entrar-codigo" class="btn-accent">Entrar</button>
+      </div>
+      <button id="btn-toggle-codigo" class="btn-link">Tenho um código de sala</button>
+    </div>
+
+    <!-- Lista de salas -->
+    <div id="painel-salas" class="painel-glass oculto">
+      <div class="painel-header">
+        <h2>Salas Disponíveis</h2>
+        <button id="btn-voltar-lobby" class="btn-link">← Voltar</button>
+      </div>
+      <div id="lista-salas-container">
+        <p class="sem-salas">Nenhuma sala disponível. Cria uma!</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ECRÃ DO JOGO -->
+<div id="ecra-jogo" class="ecra">
+  <div class="jogo-topo">
+    <div class="info-sala">
+      <span id="label-sala">Sala: ---</span>
+      <span id="label-trunfo" class="badge-trunfo">Trunfo: ---</span>
+    </div>
+    <div class="info-pontos">
+      <div class="equipa equipa-a">
+        <span id="nome-eq-a">Equipa A</span>
+        <span id="pts-eq-a" class="pontos">0</span>
+      </div>
+      <div class="separador-vs">VS</div>
+      <div class="equipa equipa-b">
+        <span id="nome-eq-b">Equipa B</span>
+        <span id="pts-eq-b" class="pontos">0</span>
+      </div>
+    </div>
+    <button id="btn-chat-toggle" class="btn-chat-icon" title="Chat">💬</button>
+  </div>
+
+  <div class="jogo-arena">
+    <!-- Jogador Cima (índice 2) -->
+    <div class="jogador-slot jogador-cima" id="slot-cima">
+      <div class="jogador-info">
+        <span class="jogador-nome" id="nome-cima">---</span>
+        <span class="jogador-cartas-count" id="count-cima">0 cartas</span>
+      </div>
+      <div class="mao-adversario" id="mao-cima"></div>
+    </div>
+
+    <!-- Área central -->
+    <div class="area-central">
+      <!-- Jogador Esquerda (índice 3) -->
+      <div class="jogador-slot jogador-esq" id="slot-esq">
+        <div class="jogador-info jogador-info-lateral">
+          <span class="jogador-nome" id="nome-esq">---</span>
+          <span class="jogador-cartas-count" id="count-esq">0</span>
+        </div>
+        <div class="mao-adversario mao-lateral" id="mao-esq"></div>
+      </div>
+
+      <!-- Mesa de jogo -->
+      <div class="mesa" id="mesa">
+        <div class="mesa-feltro">
+          <div id="cartas-mesa" class="cartas-na-mesa"></div>
+          <div id="msg-veza" class="msg-veza oculto"></div>
+          <div id="msg-turno" class="msg-turno"></div>
+        </div>
+      </div>
+
+      <!-- Jogador Direita (índice 1) -->
+      <div class="jogador-slot jogador-dir" id="slot-dir">
+        <div class="jogador-info jogador-info-lateral">
+          <span class="jogador-nome" id="nome-dir">---</span>
+          <span class="jogador-cartas-count" id="count-dir">0</span>
+        </div>
+        <div class="mao-adversario mao-lateral" id="mao-dir"></div>
+      </div>
+    </div>
+
+    <!-- O teu jogador (índice 0 = eu) -->
+    <div class="jogador-slot jogador-baixo" id="slot-baixo">
+      <div class="jogador-info">
+        <span class="jogador-nome" id="nome-eu">Tu</span>
+        <span id="badge-minha-vez" class="badge-vez oculto">A TUA VEZ!</span>
+      </div>
+      <div id="minha-mao" class="minha-mao"></div>
+    </div>
+  </div>
+
+  <!-- Painel aguardando jogadores -->
+  <div id="painel-aguardando" class="overlay-painel">
+    <div class="painel-glass">
+      <h2>🃏 A Aguardar Jogadores</h2>
+      <div id="lista-jogadores-sala"></div>
+      <div class="codigo-sala-box">
+        <p>Código da sala:</p>
+        <div id="codigo-sala-grande" class="codigo-grande"></div>
+        <button id="btn-copiar-codigo" class="btn-secondary btn-sm">Copiar</button>
+      </div>
+      <p class="hint">Partilha o código com os teus amigos!</p>
+      <button id="btn-iniciar-manual" class="btn-primary oculto">Iniciar Jogo (4 jogadores)</button>
+      <button id="btn-sair-sala" class="btn-danger btn-sm">Sair da Sala</button>
+    </div>
+  </div>
+
+  <!-- Fim de Rodada -->
+  <div id="painel-fim-rodada" class="overlay-painel oculto">
+    <div class="painel-glass painel-resultado">
+      <h2>🏆 Fim da Rodada</h2>
+      <div id="resultado-rodada"></div>
+      <div id="placar-total"></div>
+      <button id="btn-nova-rodada" class="btn-primary">Nova Rodada</button>
+      <button id="btn-sair-jogo" class="btn-danger btn-sm">Sair</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div id="painel-chat" class="chat-painel oculto">
+  <div class="chat-header">
+    <span>Chat</span>
+    <button id="btn-fechar-chat">✕</button>
+  </div>
+  <div id="chat-msgs" class="chat-msgs"></div>
+  <div class="chat-input-area">
+    <input type="text" id="chat-input" placeholder="Mensagem..." maxlength="200">
+    <button id="btn-enviar-chat">➤</button>
+  </div>
+</div>
+
+<div id="toast" class="toast oculto"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/jogo.js"></script>
+</body>
+</html>
