@@ -913,3 +913,99 @@ input[type="text"]::placeholder { color: var(--texto-dimmed); }
   .info-pontos { gap: 8px; }
   .pontos { font-size: 16px; }
 }
+
+/* ============================================
+   CORREÇÕES v2
+   ============================================ */
+
+/* Toast de veza - flutua por cima da mesa sem bloquear */
+.toast-veza {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(10, 20, 12, 0.93);
+  border: 1px solid rgba(201,162,39,0.5);
+  border-radius: 30px;
+  padding: 8px 22px;
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  color: var(--dourado);
+  white-space: nowrap;
+  z-index: 20;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+  animation: slideDown 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
+  pointer-events: none;
+}
+.toast-veza .eq-tag { color: var(--texto-dimmed); font-size: 12px; }
+
+@keyframes slideDown {
+  from { opacity: 0; top: -10px; }
+  to   { opacity: 1; top: 8px; }
+}
+
+/* Pontos de rodada e vezas no topo */
+.info-pontos-wrap {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.rodada-pts { opacity: 0.7; }
+.rodada-pts .pontos-rod {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 700;
+}
+.rodada-pts .equipa-a .pontos-rod { color: #6ee090; }
+.rodada-pts .equipa-b .pontos-rod { color: #e8a050; }
+.rodada-pts .separador-vs { font-size: 9px; color: var(--texto-dimmed); }
+
+/* Nomes dos adversários laterais - garantir que aparecem */
+.jogador-esq .jogador-nome,
+.jogador-dir .jogador-nome {
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+/* Mesa: garantir cartas visíveis, sem overlay que tape */
+.mesa { overflow: visible; }
+.mesa-feltro { position: relative; overflow: visible; }
+
+/* Cartas na mesa maiores */
+.cartas-na-mesa {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+}
+
+/* Carta animada da mesa */
+.carta-animada {
+  animation: carta-cai 0.35s cubic-bezier(0.175,0.885,0.32,1.275) both;
+}
+@keyframes carta-cai {
+  from { opacity: 0; transform: translateY(-20px) scale(0.75); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Trunfo badge com cor do naipe */
+.badge-trunfo.naipe-copas,
+.badge-trunfo.naipe-ouros { color: #e88; border-color: rgba(200,60,60,0.4); }
+.badge-trunfo.naipe-paus,
+.badge-trunfo.naipe-espadas { color: #ccc; border-color: rgba(200,200,200,0.3); }
+
+/* Arena position relative para toast-veza */
+.jogo-arena { position: relative; }
+
+/* Responsivo topo */
+@media (max-width: 700px) {
+  .info-pontos-wrap { gap: 6px; }
+  .rodada-pts { display: none; }
+  .jogo-topo { padding: 6px 10px; }
+}

@@ -11,7 +11,7 @@
 </head>
 <body>
 
-<!-- ECRÃ INICIAL -->
+<!-- ==================== LOBBY ==================== -->
 <div id="ecra-lobby" class="ecra ativo">
   <div class="lobby-bg"></div>
   <div class="lobby-centro">
@@ -25,7 +25,6 @@
       <p class="subtitulo">O jogo de cartas português</p>
     </div>
 
-    <!-- Formulário nome -->
     <div id="form-nome" class="painel-glass">
       <h2>Como te chamas?</h2>
       <input type="text" id="input-nome" placeholder="O teu nome..." maxlength="16" autocomplete="off">
@@ -40,7 +39,6 @@
       <button id="btn-toggle-codigo" class="btn-link">Tenho um código de sala</button>
     </div>
 
-    <!-- Lista de salas -->
     <div id="painel-salas" class="painel-glass oculto">
       <div class="painel-header">
         <h2>Salas Disponíveis</h2>
@@ -53,40 +51,73 @@
   </div>
 </div>
 
-<!-- ECRÃ DO JOGO -->
+<!-- ==================== JOGO ==================== -->
 <div id="ecra-jogo" class="ecra">
+
+  <!-- TOPO: info sala + pontos + chat -->
   <div class="jogo-topo">
     <div class="info-sala">
       <span id="label-sala">Sala: ---</span>
       <span id="label-trunfo" class="badge-trunfo">Trunfo: ---</span>
     </div>
-    <div class="info-pontos">
-      <div class="equipa equipa-a">
-        <span id="nome-eq-a">Equipa A</span>
-        <span id="pts-eq-a" class="pontos">0</span>
+
+    <div class="info-pontos-wrap">
+      <!-- Pontos totais -->
+      <div class="info-pontos">
+        <div class="equipa equipa-a">
+          <span id="nome-eq-a">Eq. A</span>
+          <span id="pts-eq-a" class="pontos">0</span>
+        </div>
+        <div class="separador-vs">TOT</div>
+        <div class="equipa equipa-b">
+          <span id="nome-eq-b">Eq. B</span>
+          <span id="pts-eq-b" class="pontos">0</span>
+        </div>
       </div>
-      <div class="separador-vs">VS</div>
-      <div class="equipa equipa-b">
-        <span id="nome-eq-b">Equipa B</span>
-        <span id="pts-eq-b" class="pontos">0</span>
+      <!-- Pontos da rodada atual -->
+      <div class="info-pontos rodada-pts">
+        <div class="equipa equipa-a">
+          <span id="pts-rod-a" class="pontos-rod">0</span>
+        </div>
+        <div class="separador-vs">ROD</div>
+        <div class="equipa equipa-b">
+          <span id="pts-rod-b" class="pontos-rod">0</span>
+        </div>
+      </div>
+      <!-- Vezas ganhas -->
+      <div class="info-pontos rodada-pts">
+        <div class="equipa equipa-a">
+          <span id="vezas-a" class="pontos-rod">0</span>
+        </div>
+        <div class="separador-vs">VEZ</div>
+        <div class="equipa equipa-b">
+          <span id="vezas-b" class="pontos-rod">0</span>
+        </div>
       </div>
     </div>
+
     <button id="btn-chat-toggle" class="btn-chat-icon" title="Chat">💬</button>
   </div>
 
+  <!-- ARENA -->
   <div class="jogo-arena">
-    <!-- Jogador Cima (índice 2) -->
+
+    <!-- Toast da veza (não bloqueia) -->
+    <div id="toast-veza" class="toast-veza oculto"></div>
+
+    <!-- CIMA -->
     <div class="jogador-slot jogador-cima" id="slot-cima">
       <div class="jogador-info">
         <span class="jogador-nome" id="nome-cima">---</span>
-        <span class="jogador-cartas-count" id="count-cima">0 cartas</span>
+        <span class="jogador-cartas-count" id="count-cima">0</span>
       </div>
       <div class="mao-adversario" id="mao-cima"></div>
     </div>
 
-    <!-- Área central -->
+    <!-- LINHA CENTRAL -->
     <div class="area-central">
-      <!-- Jogador Esquerda (índice 3) -->
+
+      <!-- ESQUERDA -->
       <div class="jogador-slot jogador-esq" id="slot-esq">
         <div class="jogador-info jogador-info-lateral">
           <span class="jogador-nome" id="nome-esq">---</span>
@@ -95,16 +126,15 @@
         <div class="mao-adversario mao-lateral" id="mao-esq"></div>
       </div>
 
-      <!-- Mesa de jogo -->
+      <!-- MESA -->
       <div class="mesa" id="mesa">
         <div class="mesa-feltro">
           <div id="cartas-mesa" class="cartas-na-mesa"></div>
-          <div id="msg-veza" class="msg-veza oculto"></div>
           <div id="msg-turno" class="msg-turno"></div>
         </div>
       </div>
 
-      <!-- Jogador Direita (índice 1) -->
+      <!-- DIREITA -->
       <div class="jogador-slot jogador-dir" id="slot-dir">
         <div class="jogador-info jogador-info-lateral">
           <span class="jogador-nome" id="nome-dir">---</span>
@@ -112,9 +142,10 @@
         </div>
         <div class="mao-adversario mao-lateral" id="mao-dir"></div>
       </div>
-    </div>
 
-    <!-- O teu jogador (índice 0 = eu) -->
+    </div><!-- /area-central -->
+
+    <!-- BAIXO: eu -->
     <div class="jogador-slot jogador-baixo" id="slot-baixo">
       <div class="jogador-info">
         <span class="jogador-nome" id="nome-eu">Tu</span>
@@ -122,7 +153,8 @@
       </div>
       <div id="minha-mao" class="minha-mao"></div>
     </div>
-  </div>
+
+  </div><!-- /jogo-arena -->
 
   <!-- Painel aguardando jogadores -->
   <div id="painel-aguardando" class="overlay-painel">
@@ -130,13 +162,13 @@
       <h2>🃏 A Aguardar Jogadores</h2>
       <div id="lista-jogadores-sala"></div>
       <div class="codigo-sala-box">
-        <p>Código da sala:</p>
+        <p>Código da sala</p>
         <div id="codigo-sala-grande" class="codigo-grande"></div>
         <button id="btn-copiar-codigo" class="btn-secondary btn-sm">Copiar</button>
       </div>
       <p class="hint">Partilha o código com os teus amigos!</p>
-      <button id="btn-iniciar-manual" class="btn-primary oculto">Iniciar Jogo (4 jogadores)</button>
-      <button id="btn-sair-sala" class="btn-danger btn-sm">Sair da Sala</button>
+      <button id="btn-iniciar-manual" class="btn-primary oculto">Iniciar Nova Rodada</button>
+      <button id="btn-sair-sala" class="btn-danger btn-sm" style="margin-top:12px">Sair da Sala</button>
     </div>
   </div>
 
@@ -147,10 +179,11 @@
       <div id="resultado-rodada"></div>
       <div id="placar-total"></div>
       <button id="btn-nova-rodada" class="btn-primary">Nova Rodada</button>
-      <button id="btn-sair-jogo" class="btn-danger btn-sm">Sair</button>
+      <button id="btn-sair-jogo" class="btn-danger btn-sm" style="margin-top:10px">Sair</button>
     </div>
   </div>
-</div>
+
+</div><!-- /ecra-jogo -->
 
 <!-- CHAT -->
 <div id="painel-chat" class="chat-painel oculto">
