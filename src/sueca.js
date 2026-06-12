@@ -84,6 +84,7 @@ class JogoSueca {
     this.maxRodadas = 10; // 10 vezas por rodada
     this.vezasGanhas = [0, 0]; // vezas ganhas por equipa nesta rodada
     this.placar = [0, 0]; // pontos totais (pode ser multi-rodada)
+    this.proximoInicio = 0; // jogador que começa a próxima rodada (roda a cada rodada)
   }
 
   adicionarJogador(socketId, nome) {
@@ -114,14 +115,29 @@ class JogoSueca {
     const baralho = baralhar(criarBaralho());
     const maos = distribuirCartas(baralho);
 
+    // Ordenar cada mão por naipe e, dentro do naipe, da mais forte para a mais fraca
+    const ordemNaipe = { espadas: 0, copas: 1, paus: 2, ouros: 3 };
+    maos.forEach(mao => {
+      mao.sort((a, b) => {
+        if (a.naipe !== b.naipe) return ordemNaipe[a.naipe] - ordemNaipe[b.naipe];
+        return ORDEM_CARTA[b.valor] - ORDEM_CARTA[a.valor];
+      });
+    });
+
     this.jogadores.forEach((j, i) => {
       this.maos[j.socketId] = maos[i];
     });
 
-    // Trunfo = naipe da 1ª carta do 1º jogador
-    this.trunfo = maos[0][0].naipe;
+    // O jogador que começa roda a cada rodada
+    const inicio = this.proximoInicio;
+    this.proximoInicio = (this.proximoInicio + 1) % 4;
+
+    // Trunfo = uma carta aleatória da mão de quem dá as cartas (o que começa)
+    const maoInicio = maos[inicio];
+    this.trunfo = maoInicio[Math.floor(Math.random() * maoInicio.length)].naipe;
+
     this.vezaAtual = [];
-    this.jogadorAtual = 0;
+    this.jogadorAtual = inicio;
     this.estado = 'jogando';
     this.pontosRodada = [0, 0];
     this.vezasGanhas = [0, 0];
@@ -207,9 +223,14 @@ class JogoSueca {
   }
 
   finalizarRodada(vezaInfo, vezaAnterior) {
-    // Adicionar pontos ao placar total
-    this.placar[0] += this.pontosRodada[0];
-    this.placar[1] += this.pontosRodada[1];
+    // Quem fizer 61+ pontos ganha a partida (60-60 = empate, ninguém ganha)
+    let vencedorPartida = -1;
+    if (this.pontosRodada[0] >= 61) vencedorPartida = 0;
+    else if (this.pontosRodada[1] >= 61) vencedorPartida = 1;
+
+    if (vencedorPartida !== -1) {
+      this.placar[vencedorPartida]++; // placar = partidas ganhas
+    }
 
     const resultado = {
       sucesso: true,
@@ -219,7 +240,8 @@ class JogoSueca {
       vezaCartas: vezaAnterior,
       pontosRodada: [...this.pontosRodada],
       placar: [...this.placar],
-      vezasGanhas: [...this.vezasGanhas]
+      vezasGanhas: [...this.vezasGanhas],
+      vencedorPartida // -1 = empate
     };
 
     // Reiniciar para nova rodada

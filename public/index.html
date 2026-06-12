@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Sueca Online</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -68,7 +68,7 @@
           <span id="nome-eq-a">Eq. A</span>
           <span id="pts-eq-a" class="pontos">0</span>
         </div>
-        <div class="separador-vs">TOT</div>
+        <div class="separador-vs">JOGOS</div>
         <div class="equipa equipa-b">
           <span id="nome-eq-b">Eq. B</span>
           <span id="pts-eq-b" class="pontos">0</span>
@@ -96,7 +96,10 @@
       </div>
     </div>
 
-    <button id="btn-chat-toggle" class="btn-chat-icon" title="Chat">💬</button>
+    <div class="topo-acoes">
+      <button id="btn-ultima-veza" class="btn-topo oculto" title="Ver última veza">🂠 Última veza</button>
+      <button id="btn-chat-toggle" class="btn-chat-icon" title="Chat">💬</button>
+    </div>
   </div>
 
   <!-- ARENA -->
@@ -184,6 +187,16 @@
   </div>
 
 </div><!-- /ecra-jogo -->
+
+<!-- PAINEL ÚLTIMA VEZA -->
+<div id="painel-ultima-veza" class="overlay-painel oculto" style="z-index: 90;">
+  <div class="painel-glass painel-resultado" style="max-width: 380px;">
+    <h2>🂠 Última Veza</h2>
+    <div id="ultima-veza-cartas" class="cartas-na-mesa" style="margin: 12px 0;"></div>
+    <p id="ultima-veza-info" class="hint" style="margin-bottom: 16px;"></p>
+    <button id="btn-fechar-ultima-veza" class="btn-secondary">Fechar</button>
+  </div>
+</div>
 
 <!-- CHAT -->
 <div id="painel-chat" class="chat-painel oculto">

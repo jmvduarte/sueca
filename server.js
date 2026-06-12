@@ -176,13 +176,15 @@ io.on('connection', (socket) => {
           pontosRodada: resultado.pontosRodada,
           placar: resultado.placar,
           vezasGanhas: resultado.vezasGanhas,
+          vencedorPartida: resultado.vencedorPartida,
           equipas: [
             jogo.jogadores.filter(j => j.equipa === 0).map(j => j.nome),
             jogo.jogadores.filter(j => j.equipa === 1).map(j => j.nome)
           ]
         });
 
-        setTimeout(() => emitirEstadoSala(salaId), 300);
+        // Atraso maior para o cliente mostrar primeiro o painel de resultado
+        setTimeout(() => emitirEstadoSala(salaId), 3000);
         return;
       }
     }

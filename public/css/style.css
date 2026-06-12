@@ -1009,3 +1009,278 @@ input[type="text"]::placeholder { color: var(--texto-dimmed); }
   .rodada-pts { display: none; }
   .jogo-topo { padding: 6px 10px; }
 }
+
+/* ============================================
+   v3 - MESA MAIOR + ÚLTIMA VEZA
+   ============================================ */
+
+/* Mesa muito maior - ocupa o espaço disponível */
+.mesa {
+  flex: 1;
+  max-width: min(720px, 70vw);
+  max-height: none;
+  height: 100%;
+  min-height: 260px;
+  aspect-ratio: auto;
+}
+
+.area-central {
+  flex: 1;
+  min-height: 300px;
+}
+
+/* Cartas na mesa MAIORES para se verem bem */
+.cartas-na-mesa .carta {
+  width: 76px;
+  height: 112px;
+  font-size: 17px;
+}
+.cartas-na-mesa .carta .carta-valor { font-size: 21px; }
+.cartas-na-mesa .carta .carta-naipe { font-size: 15px; }
+.cartas-na-mesa .carta .carta-centro { font-size: 34px; }
+.cartas-na-mesa .nome-jogador-mesa { font-size: 12px; }
+
+/* Reduzir adversário cima para dar espaço à mesa */
+.jogador-cima .mao-adversario .carta-costas {
+  width: 38px;
+  height: 54px;
+}
+
+/* Botões do topo */
+.topo-acoes {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-topo {
+  padding: 6px 14px;
+  background: rgba(201,162,39,0.12);
+  border: 1px solid rgba(201,162,39,0.4);
+  border-radius: 20px;
+  color: var(--dourado);
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  white-space: nowrap;
+}
+.btn-topo:hover {
+  background: rgba(201,162,39,0.25);
+  transform: translateY(-1px);
+}
+
+/* Painel última veza com cartas grandes */
+#painel-ultima-veza .cartas-na-mesa {
+  min-height: auto;
+}
+
+/* A minha mão também maior */
+.minha-mao .carta {
+  width: 66px;
+  height: 96px;
+}
+.minha-mao .carta .carta-valor { font-size: 18px; }
+.minha-mao .carta .carta-centro { font-size: 28px; }
+
+/* Mobile: ajustar */
+@media (max-width: 700px) {
+  .mesa { max-width: 95vw; min-height: 200px; }
+  .cartas-na-mesa .carta { width: 60px; height: 88px; }
+  .cartas-na-mesa .carta .carta-centro { font-size: 24px; }
+  .minha-mao .carta { width: 52px; height: 76px; }
+  .btn-topo { font-size: 10px; padding: 5px 10px; }
+  /* Esconder mãos laterais em mobile para dar espaço */
+  .mao-lateral { display: none; }
+  .jogador-info-lateral { writing-mode: vertical-rl; }
+}
+
+/* ============================================
+   v5 — LAYOUT RESPONSIVO COMPLETO
+   Cartas e mesa escalam com o ecrã via clamp()
+   ============================================ */
+
+/* Usar altura dinâmica do viewport (mobile browsers) */
+#ecra-jogo { height: 100dvh; }
+
+/* ---------- Tamanhos fluidos com variáveis ---------- */
+:root {
+  /* carta da minha mão: entre 44px e 78px conforme largura do ecrã */
+  --carta-mao-w: clamp(44px, 7.5vw, 78px);
+  --carta-mao-h: calc(var(--carta-mao-w) * 1.45);
+  /* carta na mesa: ligeiramente maior */
+  --carta-mesa-w: clamp(52px, 8.5vw, 88px);
+  --carta-mesa-h: calc(var(--carta-mesa-w) * 1.45);
+  /* costas dos adversários */
+  --costas-w: clamp(24px, 3.5vw, 42px);
+  --costas-h: calc(var(--costas-w) * 1.42);
+}
+
+/* Minha mão — fluida */
+.minha-mao .carta {
+  width: var(--carta-mao-w);
+  height: var(--carta-mao-h);
+}
+.minha-mao .carta .carta-valor { font-size: clamp(13px, 1.8vw, 19px); }
+.minha-mao .carta .carta-naipe { font-size: clamp(10px, 1.4vw, 14px); }
+.minha-mao .carta .carta-centro { font-size: clamp(18px, 2.8vw, 30px); }
+
+/* Cartas na mesa — fluidas */
+.cartas-na-mesa .carta {
+  width: var(--carta-mesa-w);
+  height: var(--carta-mesa-h);
+}
+.cartas-na-mesa .carta .carta-valor { font-size: clamp(15px, 2.1vw, 22px); }
+.cartas-na-mesa .carta .carta-naipe { font-size: clamp(11px, 1.5vw, 16px); }
+.cartas-na-mesa .carta .carta-centro { font-size: clamp(20px, 3.4vw, 36px); }
+
+/* Costas dos adversários — fluidas */
+.mao-adversario .carta-costas {
+  width: var(--costas-w);
+  height: var(--costas-h);
+}
+.mao-lateral .carta-costas {
+  width: calc(var(--costas-w) * 0.85);
+  height: calc(var(--costas-h) * 0.85);
+}
+
+/* Mesa: escala com ambos os eixos */
+.mesa {
+  max-width: min(760px, 72vw);
+  min-height: clamp(180px, 32vh, 420px);
+}
+
+/* Toast veza responsivo */
+.toast-veza {
+  font-size: clamp(11px, 1.6vw, 14px);
+  max-width: 92vw;
+  white-space: normal;
+  text-align: center;
+}
+
+/* Topo flexível */
+.jogo-topo { flex-wrap: wrap; gap: 6px; }
+.info-pontos-wrap { flex: 1; justify-content: center; min-width: 0; }
+.equipa span:first-child {
+  max-width: clamp(60px, 14vw, 160px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================
+   TABLET (≤1024px)
+   ============================================ */
+@media (max-width: 1024px) {
+  .mesa { max-width: 78vw; }
+  .jogador-esq .jogador-nome,
+  .jogador-dir .jogador-nome { max-width: 64px; font-size: 11px; }
+}
+
+/* ============================================
+   TELEMÓVEL VERTICAL (≤640px)
+   ============================================ */
+@media (max-width: 640px) {
+  .jogo-arena { padding: 6px; gap: 4px; }
+  .area-central { gap: 4px; min-height: 0; }
+
+  /* Mesa ocupa quase toda a largura */
+  .mesa {
+    max-width: none;
+    flex: 1;
+    min-height: clamp(150px, 30vh, 280px);
+    border-radius: 14px;
+    border-width: 2px;
+  }
+
+  /* Laterais ficam só com nome vertical + contagem (sem cartas) */
+  .mao-lateral { display: none; }
+  .jogador-esq, .jogador-dir { min-width: 28px; }
+  .jogador-info-lateral {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    gap: 6px;
+  }
+  .jogador-esq .jogador-info-lateral { transform: rotate(180deg); }
+
+  /* Cima: nome + contagem compactos */
+  .jogador-cima .mao-adversario .carta-costas {
+    width: 20px; height: 29px; margin: 0 -5px;
+  }
+  .jogador-cima { gap: 2px; }
+
+  /* Mão própria: scroll horizontal suave */
+  .minha-mao {
+    gap: 4px;
+    padding: 6px 6px 10px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Topo compacto: esconder rodada/vezas (já existia), nomes curtos */
+  .info-sala { font-size: 11px; }
+  #label-sala { font-size: 11px; }
+  .badge-trunfo { font-size: 11px; }
+  .pontos { font-size: 15px; }
+  .btn-topo { font-size: 9px; padding: 4px 8px; }
+
+  /* Painéis overlay quase ecrã inteiro */
+  .overlay-painel { padding: 10px; }
+  .overlay-painel .painel-glass { padding: 18px; }
+  .codigo-grande { font-size: 26px; letter-spacing: 0.2em; }
+
+  /* Toast veza compacto */
+  .toast-veza { padding: 6px 14px; }
+
+  /* Chat ocupa metade do ecrã */
+  .chat-painel { height: 50dvh; }
+}
+
+/* ============================================
+   TELEMÓVEL HORIZONTAL (altura baixa)
+   ============================================ */
+@media (max-height: 500px) and (orientation: landscape) {
+  .jogo-topo { padding: 4px 10px; }
+  .jogo-arena { padding: 4px; gap: 2px; }
+
+  /* Esconder mão de cima (só nome) para ganhar altura */
+  #mao-cima { display: none; }
+  .jogador-cima { flex-direction: row; gap: 8px; }
+
+  .mesa { min-height: 0; flex: 1; }
+
+  :root {
+    --carta-mao-w: clamp(38px, 6vh, 56px);
+    --carta-mesa-w: clamp(44px, 9vh, 64px);
+  }
+
+  .minha-mao { padding: 2px 6px 6px; }
+  .badge-vez { font-size: 9px; padding: 2px 8px; }
+  .jogador-nome { font-size: 11px; }
+
+  /* Laterais minimalistas */
+  .mao-lateral { display: none; }
+  .rodada-pts { display: none; }
+}
+
+/* ============================================
+   ECRÃS MUITO PEQUENOS (≤360px)
+   ============================================ */
+@media (max-width: 360px) {
+  :root { --carta-mao-w: clamp(38px, 9vw, 48px); }
+  .titulo-jogo { font-size: 36px; }
+  .botoes-acao { grid-template-columns: 1fr; }
+  .info-pontos-wrap .equipa span:first-child { max-width: 50px; font-size: 10px; }
+}
+
+/* ============================================
+   ECRÃS GRANDES (≥1600px) — aproveitar espaço
+   ============================================ */
+@media (min-width: 1600px) {
+  :root {
+    --carta-mao-w: 86px;
+    --carta-mesa-w: 96px;
+    --costas-w: 46px;
+  }
+  .mesa { max-width: 860px; }
+  .pontos { font-size: 24px; }
+}

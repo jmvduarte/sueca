@@ -12,6 +12,8 @@ let cartaSelecionada = null;
 let emJogo = false;
 let vezaTimeout = null;
 let bloqueadoVeza = false; // bloquear cliques durante animação veza
+let ultimaVeza = null;     // {vezaInfo, vezaCartas, jogadores} para consulta
+let fimRodadaVisivel = false; // não mostrar painel aguardando enquanto resultado aberto
 
 const NAIPE_SIMBOLO = { ouros: '♦', copas: '♥', paus: '♣', espadas: '♠' };
 
@@ -145,9 +147,9 @@ function renderizarEstado(estado) {
   // Minha mão
   renderizarMinhaMao(estado);
 
-  // Painel aguardando
+  // Painel aguardando (nunca mostrar enquanto o resultado da rodada está aberto)
   const jogando = estado.estado === 'jogando';
-  painelAguardando.style.display = jogando ? 'none' : 'flex';
+  painelAguardando.style.display = (jogando || fimRodadaVisivel || bloqueadoVeza) ? 'none' : 'flex';
   if (!jogando) renderizarAguardando(estado);
 
   // Badge vez
@@ -227,6 +229,14 @@ function mostrarResultadoVeza(vezaInfo, vezaCartas) {
   bloqueadoVeza = true;
   cartaSelecionada = null;
 
+  // Guardar para o botão "Última veza"
+  ultimaVeza = {
+    vezaInfo,
+    vezaCartas,
+    nomes: (vezaCartas || []).map(({ jogadorIdx }) => estadoAtual?.jogadores?.[jogadorIdx]?.nome || `Jogador ${jogadorIdx+1}`)
+  };
+  document.getElementById('btn-ultima-veza').classList.remove('oculto');
+
   // Mostrar as cartas da veza completa na mesa
   cartasMesa.innerHTML = '';
   (vezaCartas || []).forEach(({ carta, jogadorIdx }) => {
@@ -298,6 +308,10 @@ socket.on('jogador_saiu', ({ nome }) => {
 socket.on('jogo_iniciado', ({ trunfo }) => {
   emJogo = true;
   bloqueadoVeza = false;
+  fimRodadaVisivel = false;
+  ultimaVeza = null;
+  document.getElementById('btn-ultima-veza').classList.add('oculto');
+  document.getElementById('painel-ultima-veza').classList.add('oculto');
   painelAguardando.style.display = 'none';
   painelFimRodada.classList.add('oculto');
   toastVeza.classList.add('oculto');
@@ -314,6 +328,7 @@ socket.on('veza_completa', ({ vezaInfo, vezaCartas }) => {
 });
 
 socket.on('fim_rodada', (dados) => {
+  fimRodadaVisivel = true;
   setTimeout(() => {
     bloqueadoVeza = false;
     toastVeza.classList.add('oculto');
@@ -418,16 +433,50 @@ document.getElementById('btn-sair-sala').addEventListener('click', () => locatio
 document.getElementById('btn-sair-jogo').addEventListener('click', () => location.reload());
 
 document.getElementById('btn-nova-rodada').addEventListener('click', () => {
+  fimRodadaVisivel = false;
   painelFimRodada.classList.add('oculto');
   socket.emit('nova_rodada');
+});
+
+// ============================================
+//  ÚLTIMA VEZA (consulta para contar trunfos)
+// ============================================
+document.getElementById('btn-ultima-veza').addEventListener('click', () => {
+  if (!ultimaVeza) return;
+  const painel = document.getElementById('painel-ultima-veza');
+  const container = document.getElementById('ultima-veza-cartas');
+  container.innerHTML = '';
+
+  ultimaVeza.vezaCartas.forEach(({ carta }, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'carta-mesa-wrap';
+    const cartaEl = criarCartaHTML(carta);
+    const nomeEl = document.createElement('span');
+    nomeEl.className = 'nome-jogador-mesa';
+    nomeEl.textContent = ultimaVeza.nomes[i] || '';
+    wrap.appendChild(cartaEl);
+    wrap.appendChild(nomeEl);
+    container.appendChild(wrap);
+  });
+
+  const eq = ultimaVeza.vezaInfo.equipa === 0 ? 'A' : 'B';
+  document.getElementById('ultima-veza-info').textContent =
+    `${ultimaVeza.vezaInfo.nomeVencedor} ganhou (+${ultimaVeza.vezaInfo.pontos} pts, Eq. ${eq})`;
+
+  painel.classList.remove('oculto');
+});
+
+document.getElementById('btn-fechar-ultima-veza').addEventListener('click', () => {
+  document.getElementById('painel-ultima-veza').classList.add('oculto');
 });
 
 // ============================================
 //  FIM RODADA
 // ============================================
 function mostrarFimRodada(dados) {
-  const { pontosRodada, placar, vezasGanhas, equipas } = dados;
-  const vencedora = pontosRodada[0] > pontosRodada[1] ? 0 : pontosRodada[1] > pontosRodada[0] ? 1 : -1;
+  const { pontosRodada, placar, vezasGanhas, equipas, vencedorPartida } = dados;
+  const vencedora = vencedorPartida !== undefined ? vencedorPartida
+    : (pontosRodada[0] > pontosRodada[1] ? 0 : pontosRodada[1] > pontosRodada[0] ? 1 : -1);
   const nomeA = equipas[0].join(' & ') || 'Equipa A';
   const nomeB = equipas[1].join(' & ') || 'Equipa B';
 
@@ -436,18 +485,19 @@ function mostrarFimRodada(dados) {
       <div class="nome-eq-resultado">${nomeA}</div>
       <div class="pts-resultado" style="color:var(--verde-brilho)">${pontosRodada[0]}</div>
       <div style="font-size:12px;color:var(--texto-dimmed)">${vezasGanhas[0]} vezas</div>
-      ${vencedora === 0 ? '<span class="label-vencedor">🏆 VENCEU</span>' : ''}
+      ${vencedora === 0 ? '<span class="label-vencedor">🏆 GANHOU A PARTIDA</span>' : ''}
     </div>
     <div class="resultado-equipa${vencedora === 1 ? ' vencedor' : ''}">
       <div class="nome-eq-resultado">${nomeB}</div>
       <div class="pts-resultado" style="color:#e8a050">${pontosRodada[1]}</div>
       <div style="font-size:12px;color:var(--texto-dimmed)">${vezasGanhas[1]} vezas</div>
-      ${vencedora === 1 ? '<span class="label-vencedor">🏆 VENCEU</span>' : ''}
+      ${vencedora === 1 ? '<span class="label-vencedor">🏆 GANHOU A PARTIDA</span>' : ''}
     </div>
   `;
 
+  const empate = vencedora === -1 ? '<br><em style="color:var(--texto-dimmed)">Empate 60-60 — ninguém leva a partida!</em>' : '';
   document.getElementById('placar-total').innerHTML =
-    `Placar total: <strong>${nomeA} ${placar[0]}</strong> — <strong>${placar[1]} ${nomeB}</strong>`;
+    `Partidas ganhas: <strong>${nomeA} ${placar[0]}</strong> — <strong>${placar[1]} ${nomeB}</strong>${empate}`;
 
   painelFimRodada.classList.remove('oculto');
 
